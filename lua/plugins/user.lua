@@ -74,7 +74,7 @@ return {
           {
             pane = 2,
             section = "terminal",
-            cmd = "cbonsai --live -c 0,1 -i",
+            cmd = "~/.config/nvim/bin/cbonsai.sh --live -c 0,1 -i",
             height = 30,
             padding = { 0, 0 },
             gap = 0,
