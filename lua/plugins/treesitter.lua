@@ -1,59 +1,75 @@
--- if true then return {} end -- WARN: REMOVE THIS LINE TO ACTIVATE THIS FILE
+-- AstroNvim v6 configures treesitter through astrocore.opts.treesitter.
+-- nvim-treesitter still runs under the hood as a parser installer (on its main branch now).
+-- No plugin-level config override needed.
 
 ---@type LazySpec
 return {
   {
-    "nvim-treesitter/nvim-treesitter",
+    "AstroNvim/astrocore",
     opts = {
-      ensure_installed = {
-        "lua",
-        "vim",
-        "bash",
-        "python",
-        "markdown",
-        "json",
-        "c",
-        "cpp",
-        "javascript",
-        "typescript",
-        "rust",
-        "yaml",
+      -- v6-style treesitter config (highlight, indent, ensure_installed, etc.)
+      treesitter = {
+        highlight = true,
+        indent = true,
+        auto_install = true, -- automatically install parsers for detected filetypes
+        ensure_installed = {
+          "lua",
+          "vim",
+          "vimdoc",
+          "bash",
+          "python",
+          "markdown",
+          "markdown_inline",
+          "json",
+          "c",
+          "cpp",
+          "javascript",
+          "typescript",
+          "rust",
+          "yaml",
+        },
+      },
+
+      -- Global fold settings — open all folds by default, use TS when available
+      options = {
+        opt = {
+          foldcolumn = "0",    -- no fold gutter column
+          foldlevel = 99,      -- start with everything unfolded
+          foldlevelstart = 99,
+          foldenable = true,
+          foldnestmax = 4,
+          foldtext = "",       -- show first line of fold verbatim (nvim 0.10+)
+        },
+      },
+
+      autocmds = {
+        -- Pick treesitter folding when a parser + fold query exist, else indent.
+        -- Uses Neovim 0.12 nil-safe get_parser() (returns nil on failure, no throw).
+        treesitter_folds = {
+          {
+            event = { "BufReadPost", "FileType" },
+            desc = "Enable treesitter folding if parser available, else indent folding",
+            callback = function(args)
+              local bufnr = args.buf
+              -- Neovim 0.12: get_parser returns nil (never throws) — check directly
+              local parser = vim.treesitter.get_parser(bufnr, nil, { error = false })
+              local has_fold_query = false
+              if parser then
+                local ft = vim.bo[bufnr].filetype
+                has_fold_query = ft ~= "" and vim.treesitter.query.get(ft, "folds") ~= nil
+              end
+
+              if parser and has_fold_query then
+                vim.opt_local.foldmethod = "expr"
+                vim.opt_local.foldexpr = "v:lua.vim.treesitter.foldexpr()"
+              else
+                vim.opt_local.foldmethod = "indent"
+                vim.opt_local.foldexpr = "0"
+              end
+            end,
+          },
+        },
       },
     },
-    config = function(_, opts)
-      -- run Astro’s default config first
-      require "astronvim.plugins.configs.nvim-treesitter"(_, opts)
-
-      -- helpers: check if TS folds are available
-      local function ts_can_fold(bufnr)
-        local okp = pcall(vim.treesitter.get_parser, bufnr)
-        local okq = pcall(vim.treesitter.query.get, vim.bo[bufnr].filetype, "folds")
-        return okp and okq
-      end
-
-      -- apply foldmethod depending on parser/query availability
-      local function apply_folds(bufnr)
-        if ts_can_fold(bufnr) then
-          vim.opt_local.foldmethod = "expr"
-          vim.opt_local.foldexpr = "v:lua.vim.treesitter.foldexpr()"
-        else
-          vim.opt_local.foldmethod = "indent"
-          vim.opt_local.foldexpr = "0"
-        end
-      end
-
-      -- global fold defaults (per your taste)
-      vim.opt.foldcolumn = "0" -- no extra column
-      vim.opt.foldlevel = 99 -- open all folds by default
-      vim.opt.foldlevelstart = 99 -- start unfolded
-      vim.opt.foldenable = true -- enable folding
-      vim.opt.foldnestmax = 4 -- max nesting
-      pcall(function() vim.opt.foldtext = "" end) -- don’t overwrite folded line
-
-      -- reapply when buffers open or filetype changes
-      vim.api.nvim_create_autocmd({ "BufReadPost", "FileType" }, {
-        callback = function(args) apply_folds(args.buf) end,
-      })
-    end,
   },
 }

@@ -1,4 +1,4 @@
-local M = { "smartinellimarco/nvcheatsheet.nvim" }
+local M = { "El3ssar/nvcheatsheet.nvim" }
 
 -- --- dynamic collector (leader-only, dedupe, robust normalization)
 -- leader-only dynamic collector, prints "<leader>", merges unknown into "Misc"
@@ -71,8 +71,8 @@ local function build_sections()
   end
 
   local function collect(mode)
-    local ok, maps = pcall(vim.keymap.get, mode)
-    if not ok then maps = vim.api.nvim_get_keymap(mode) end
+    -- vim.keymap.get does not exist; use the public API directly
+    local maps = vim.api.nvim_get_keymap(mode)
     for _, m in ipairs(vim.api.nvim_buf_get_keymap(0, mode)) do
       maps[#maps + 1] = m
     end

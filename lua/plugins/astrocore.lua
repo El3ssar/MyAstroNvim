@@ -2,8 +2,6 @@
 
 -- AstroCore provides a central place to modify mappings, vim options, autocommands, and more!
 -- Configuration documentation can be found with `:h astrocore`
--- NOTE: We highly recommend setting up the Lua Language Server (`:LspInstall lua_ls`)
---       as this provides autocomplete and documentation while editing
 
 ---@type LazySpec
 return {
@@ -12,22 +10,30 @@ return {
   opts = {
     -- Configure core features of AstroNvim
     features = {
-      autopairs = true, -- enable autopairs at start
-      cmp = true, -- enable completion at start
-      diagnostics = { virtual_text = true, virtual_lines = true }, -- diagnostic settings on startup
-      highlighturl = true, -- highlight URLs at start
-      notifications = true, -- enable notifications at start
+      large_buf = { size = 1024 * 256, lines = 10000 }, -- disable heavy features above this size
+      autopairs = true,       -- enable autopairs at start
+      cmp = true,             -- enable completion at start
+      -- virtual_lines intentionally kept on: shows full diagnostics inline.
+      -- Set virtual_lines = false if you find it too noisy alongside virtual_text.
+      diagnostics = { virtual_text = true, virtual_lines = true },
+      highlighturl = true,    -- highlight URLs at start
+      notifications = true,   -- enable notifications at start
     },
-    -- vim options can be configured here
+    -- Diagnostics configuration passed to vim.diagnostic.config()
+    diagnostics = {
+      virtual_text = true,
+      underline = true,
+    },
+    -- vim options
     options = {
-      opt = { -- vim.opt.<key>
-        relativenumber = false, -- sets vim.opt.relativenumber
-        number = true, -- sets vim.opt.number
-        spell = false, -- sets vim.opt.spell
-        signcolumn = "yes", -- sets vim.opt.signcolumn to yes
-        wrap = true, -- sets vim.opt.wrap
-        mouse = "a", -- sets vim.opt.mouse to 'a'
-        mousemodel = "extend", -- sets vim.opt.mousemodel to 'extend'
+      opt = {
+        relativenumber = false,
+        number = true,
+        spell = false,
+        signcolumn = "yes",
+        wrap = true,
+        mouse = "a",
+        mousemodel = "extend",
       },
     },
     mappings = {
@@ -36,7 +42,8 @@ return {
           function()
             local bufs = vim.fn.getbufinfo { buflisted = 1 }
             require("astrocore.buffer").close(0)
-            if not bufs[2] then require("snacks").dashboard() end
+            -- snacks.dashboard is a module table, not a function — use .open()
+            if not bufs[2] then require("snacks").dashboard.open() end
           end,
           desc = "Close buffer",
         },

@@ -6,6 +6,10 @@
 
 ---@type LazySpec
 return {
+  -- aerial.nvim v3.1+ fixes the Neovim 0.12 `iter_matches({all=false})` crash.
+  -- AstroNvim v5 pins it to ^2.2 via its snapshot; this override removes that pin.
+  { "stevearc/aerial.nvim", version = false },
+
   {
     "folke/snacks.nvim",
     -- Load on start so the dashboard is ready on VimEnter
