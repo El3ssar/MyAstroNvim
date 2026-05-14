@@ -13,11 +13,15 @@ return {
     -- change colorscheme
     colorscheme = "github_dark_dimmed",
     -- AstroUI allows you to easily modify highlight groups easily for any and all colorschemes
-    -- highlights = {
-    --   init = { -- this table overrides highlights in all themes
-    --     Normal = { bg = "#000000" },
-    --   },
-    -- },
+    highlights = {
+      init = { -- applies across all themes
+        -- gitcommit syntax ships with Neovim but colorschemes rarely define it.
+        -- Link overflow text (subject > 50 chars) to Error so it's visibly red.
+        gitcommitOverflow = { link = "Error" },
+        -- Also make the summary portion a distinct color (optional, looks nice).
+        gitcommitSummary  = { link = "String" },
+      },
+    },
     -- Icons can be configured throughout the interface
     icons = {
       -- configure the loading of the lsp in the status line

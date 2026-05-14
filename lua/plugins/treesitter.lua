@@ -9,6 +9,16 @@ return {
     opts = {
       -- v6-style treesitter config (highlight, indent, ensure_installed, etc.)
       treesitter = {
+        -- Disable treesitter entirely for git filetypes so Neovim's built-in
+        -- vim syntax runs instead.  The built-in gitcommit syntax has rich
+        -- overflow colouring (gitcommitOverflow → Error), spell-check regions,
+        -- and diff highlighting that the treesitter parser doesn't reproduce.
+        enabled = function(lang, bufnr)
+          local git_fts = { gitcommit = true, gitrebase = true, gitsendemail = true }
+          local ft = vim.bo[bufnr or 0].filetype
+          if git_fts[ft] or git_fts[lang] then return false end
+          return not require("astrocore.buffer").is_large(bufnr or 0)
+        end,
         highlight = true,
         indent = true,
         auto_install = true, -- automatically install parsers for detected filetypes

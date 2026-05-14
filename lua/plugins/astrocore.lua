@@ -36,6 +36,25 @@ return {
         mousemodel = "extend",
       },
     },
+    autocmds = {
+      -- Git commit message polish:
+      --   • spell checking on
+      --   • subject-line column guide at 51 (overflow starts at char 51)
+      --   • body hard-wrap at 72; column guide reinforces the limit
+      --   • move cursor to top so you start typing the subject immediately
+      gitcommit_settings = {
+        {
+          event = "FileType",
+          pattern = "gitcommit",
+          desc = "Set git commit message editor options",
+          callback = function()
+            vim.opt_local.spell     = true
+            vim.opt_local.textwidth = 72
+            vim.cmd "normal! gg"
+          end,
+        },
+      },
+    },
     mappings = {
       n = {
         ["<Leader>c"] = {
