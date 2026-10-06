@@ -1,12 +1,10 @@
+-- which-key: only pop up for <Leader> (normal, visual, operator-pending).
+-- Avoids the popup appearing on every mode change in visual/select mode.
+
 ---@type LazySpec
 return {
-  {
-    "folke/which-key.nvim",
-    opts = function(_, opts)
-      -- Stop auto triggers in visual/select (no ModeChanged there),
-      -- but keep normal & operator-pending auto behavior.
-      opts.triggers = { { "<leader>", mode = { "n", "x", "o" } } }
-      return opts
-    end,
+  "folke/which-key.nvim",
+  opts = {
+    triggers = { { "<Leader>", mode = { "n", "x", "o" } } },
   },
 }

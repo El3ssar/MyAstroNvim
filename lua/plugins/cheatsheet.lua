@@ -1,7 +1,7 @@
 local M = { "El3ssar/nvcheatsheet.nvim" }
 
--- --- dynamic collector (leader-only, dedupe, robust normalization)
--- leader-only dynamic collector, prints "<leader>", merges unknown into "Misc"
+-- Cheatsheet (F1) built at runtime from every <Leader>/<LocalLeader> mapping
+-- that has a description, grouped by the key after the leader.
 local function build_sections()
   local leader = vim.g.mapleader or " "
   local localleader = vim.g.maplocalleader or ","
@@ -18,17 +18,14 @@ local function build_sections()
     elseif #leader == 1 then
       s = s:gsub("^" .. esc(leader), "<leader>")
     end
+    if #localleader == 1 and s:sub(1, 1) == localleader then s = "<localleader>" .. s:sub(2) end
     return s
   end
 
-  -- pretty-print WITHOUT expanding leader/localleader tokens
+  -- pretty-print special keys (leader tokens are kept literal)
   local function prettify(lhs)
     local s = lhs
-    -- keep these literal
-    s = s:gsub("<leader>", "<leader>")
-    s = s:gsub("<localleader>", "<localleader>")
-    -- cosmetics
-    s = s:gsub("<CR>", "⏎")
+      :gsub("<CR>", "⏎")
       :gsub("<Tab>", "Tab")
       :gsub("<S%-Tab>", "S-Tab")
       :gsub("<Esc>", "Esc")
@@ -39,8 +36,8 @@ local function build_sections()
       :gsub("<Right>", "→")
       :gsub("<C%-([%w%p])>", "⌃%1")
       :gsub("<S%-([%w%p])>", "⇧%1")
-      :gsub("<A%-([%w%p])>", "⎇%1")
-      :gsub("<M%-([%w%p])>", "⎇%1")
+      :gsub("<A%-([%w%p])>", "⌥%1")
+      :gsub("<M%-([%w%p])>", "⌥%1")
       :gsub("<F(%d+)>", "F%1")
     return s
   end
@@ -97,8 +94,6 @@ local function build_sections()
   end
   return sections
 end
-
--- --- end collector
 
 M.opts = {
   header = {

@@ -1,18 +1,12 @@
+-- flatten: `nvim file` inside a :terminal opens the file in this nvim instead of nesting.
+-- Git commit/rebase buffers block until closed (plugin default).
+
 ---@type LazySpec
 return {
-  {
-    "willothy/flatten.nvim",
-    lazy = false, -- load ASAP so forwarding has no delay
-    priority = 1001,
-    opts = {
-      -- Don't steal your terminal window; open in your last non-terminal window
-      window = { open = "alternate" },
-      -- Block only when it makes sense (git commits/rebases). Defaults already do this.
-      -- block_for = { gitcommit = true, gitrebase = true },
-      hooks = {
-        -- Keep defaults; no need to hide your terminal
-        -- You can add custom behavior later if you want (see README).
-      },
-    },
+  "willothy/flatten.nvim",
+  lazy = false, -- must load early so forwarding has no delay
+  priority = 1001,
+  opts = {
+    window = { open = "alternate" }, -- open in the last non-terminal window
   },
 }

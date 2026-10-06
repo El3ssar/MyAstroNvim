@@ -1,22 +1,22 @@
-return {
-  {
-    "saghen/blink.cmp",
-    opts = function(_, opts)
-      -- make sure keymap table exists
-      opts.keymap = opts.keymap or {}
+-- Completion: Enter accepts (selecting the first item if needed), Esc closes the menu.
+-- Alt+Space opens the menu manually (macOS grabs Ctrl+Space for switching input source).
 
-      -- add/override your mappings
-      opts.keymap["<CR>"] = { "select_and_accept", "fallback" }
-      opts.keymap["<Esc>"] = {
+---@type LazySpec
+return {
+  "saghen/blink.cmp",
+  opts = {
+    keymap = {
+      ["<M-Space>"] = { "show", "show_documentation", "hide_documentation" },
+      ["<CR>"] = { "select_and_accept", "fallback" },
+      ["<Esc>"] = {
         function(cmp)
           if cmp.is_visible() then
-            cmp.cancel() -- or cmp.hide()
+            cmp.cancel()
             return true
           end
         end,
         "fallback",
-      }
-      return opts
-    end,
+      },
+    },
   },
 }
